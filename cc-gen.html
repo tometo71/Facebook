@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CC Generator</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      background: linear-gradient(145deg, #0d1117, #161b22);
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      color: #ffffff;
+      overflow-y: auto; /* Fix scrolling */
+    }
+
+    .card {
+      background: rgba(22, 27, 34, 0.95);
+      border-radius: 15px;
+      padding: 25px;
+      max-width: 480px;
+      width: 100%;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(12px);
+      transition: transform 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-10px);
+    }
+
+    .terminal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 20px;
+      border-bottom: 1px solid #444;
+    }
+
+    .terminal-title {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      font-weight: 600;
+    }
+
+    .terminal-icon {
+      color: #36a3f7;
+    }
+
+    .terminal-body {
+      margin-top: 20px;
+    }
+
+    .command-line {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      margin-top: 10px;
+    }
+
+    .prompt {
+      color: #8b949e;
+      font-size: 14px;
+    }
+
+    .input-field {
+      background: #0d1117;
+      border: 1px solid #333;
+      border-radius: 8px;
+      padding: 12px;
+      font-size: 16px;
+      color: #36a3f7;
+      outline: none;
+      transition: border-color 0.3s ease;
+    }
+
+    .input-field:focus {
+      border-color: #36a3f7;
+    }
+
+    .input-field::placeholder {
+      color: rgba(255, 255, 255, 0.4);
+    }
+
+    .login-button {
+      background: linear-gradient(145deg, #36a3f7, #0096d1);
+      color: #fff;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100.0%;
+    }
+
+    .login-button:hover {
+      background: linear-gradient(145deg, #007bb3, #004f8b);
+    }
+
+    .output-field textarea {
+      width: 100%;
+      height: 150px;
+      background-color: #16161c;
+      color: #007bb3;
+      border: 1px solid #555;
+      padding: 10px;
+      border-radius: 5px;
+      resize: none;
+      outline: none;
+    }
+
+    
+    @media (max-width: 480px) {
+      .card {
+        padding: 20px;
+        width: 90%;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="terminal-header">
+      <span class="terminal-title">
+        <svg class="terminal-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 17l6-6-6-6M12 19h8"></path>
+        </svg>
+        CC Generator
+      </span>
+    </div>
+    <div class="terminal-body">
+      <form class="command-line">
+        <label class="prompt" for="input">Input:</label>
+        <input type="text" id="input" class="input-field" placeholder="Enter input (e.g., 123456xxxxxx)">
+
+        <label class="prompt" for="amount">Amount:</label>
+        <input type="number" id="amount" class="input-field" placeholder="Enter amount" min="1">
+
+        <label class="prompt" for="ccv">CCV:</label>
+        <select id="ccv" class="input-field">
+          <option value="random">Random</option>
+          <option value="custom">Custom</option>
+        </select>
+        <input type="number" id="ccv-input" class="input-field" placeholder="Enter custom CCV" style="display: none;" min="100" max="999">
+
+        <label class="prompt" for="date">Date:</label>
+        <select id="date" class="input-field">
+          <option value="random">Random</option>
+          <option value="custom">Custom</option>
+        </select>
+        <input type="month" id="date-input" class="input-field" placeholder="Enter custom date" style="display: none;" min="2025-01-01">
+
+        <button type="button" class="login-button" onclick="generateCC()">Generate</button>
+
+        <div class="output-field">
+          <textarea id="output" readonly placeholder="Generated CCs will appear here..."></textarea>
+          <br><br>
+          <button type="button" class="login-button" onclick="copyOutput()">Copy All</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function generateCC() {
+      const input = document.getElementById('input').value;
+      const amount = parseInt(document.getElementById('amount').value);
+      const ccv = document.getElementById('ccv').value;
+      const ccvInput = document.getElementById('ccv-input').value;
+      const date = document.getElementById('date').value;
+      const dateInput = document.getElementById('date-input').value;
+
+      const output = [];
+      for (let i = 0; i < amount; i++) {
+        let cardNumber = input.replace(/x/g, () => Math.floor(Math.random() * 10));
+        while (cardNumber.length < 16) {
+          cardNumber += Math.floor(Math.random() * 10);
+        }
+
+        const ccvValue = ccv === 'random'
+          ? Math.floor(100 + Math.random() * 900)
+          : ccvInput;
+
+        let dateValue = date === 'random' 
+          ? `${String(Math.floor(Math.random() * 12) + 1).padStart(2, '0')}|${String(Math.floor(Math.random() * 6) + 2025)}`
+          : new Date(dateInput).toLocaleDateString("en-GB", { month: '2-digit', year: '2-digit' });
+
+        output.push(`${cardNumber}|${dateValue}|${ccvValue}`);
+      }
+
+      document.getElementById('output').value = output.join('\n');
+    }
+
+    function copyOutput() {
+      const output = document.getElementById('output').value;
+      navigator.clipboard.writeText(output).then(() => {
+        alert('Copied to clipboard!');
+      });
+    }
+
+    document.getElementById('ccv').addEventListener('change', (e) => {
+      document.getElementById('ccv-input').style.display = e.target.value === 'custom' ? 'block' : 'none';
+    });
+
+    document.getElementById('date').addEventListener('change', (e) => {
+      document.getElementById('date-input').style.display = e.target.value === 'custom' ? 'block' : 'none';
+    });
+  </script>
+</body>
+</html>
